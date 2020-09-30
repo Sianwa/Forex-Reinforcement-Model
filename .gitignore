@@ -1,0 +1,4 @@
+project_env
+.vscode
+#byte compiled
+__pycache__/
