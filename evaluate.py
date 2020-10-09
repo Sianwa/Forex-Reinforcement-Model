@@ -6,7 +6,7 @@ from functions import *
 from tqdm import tqdm
 import sys
 
-trained_model = load_model("ai_trader_50.h5")
+trained_model = load_model("models/ai_trader_50.h5")
 
 #hyperparameters
 window_size = 10

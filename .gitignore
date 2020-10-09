@@ -2,3 +2,4 @@ project_env
 .vscode
 #byte compiled
 __pycache__/
+models

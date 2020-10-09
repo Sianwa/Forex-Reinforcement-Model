@@ -68,4 +68,4 @@ for episode in range(1, episodes + 1):
 
    # save model weights and parameters at epochs divisible by 10
     if episode % 10 == 0:
-        trader.model.save("ai_trader_{}.h5".format(episode))
+        trader.model.save("models/ai_trader_{}.h5".format(episode))
