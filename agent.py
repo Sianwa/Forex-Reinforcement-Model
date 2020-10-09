@@ -10,7 +10,7 @@ from collections import deque
 
 
 class AI_Trader:
-    def __init__(self, state_size, is_eval=False, model_name="AITrader"):
+    def __init__(self, state_size, is_eval=False, model_name=""):
         self.state_size = state_size  # normalized previous days
         self.action_size = 3  # sit, buy, sell
         self.memory = deque(maxlen=1000)
@@ -24,7 +24,7 @@ class AI_Trader:
         self.epsilon_decay = 0.995
 
         self.model = load_model(
-            "models/" + model_name) if is_eval else self._model()
+            model_name) if is_eval else self._model()
 
     def _model(self):
         model = Sequential()
@@ -36,7 +36,7 @@ class AI_Trader:
 
         return model
 
-    def act(self, state):
+    def act(self, state):    
         if not self.is_eval and np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
 

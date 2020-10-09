@@ -16,6 +16,7 @@ def formatPrice(n):
 # data from it. For now we have a csv so we wont use OANDA API.
 # another option is pandas_datareader that gives remote access to data
 
+#dataset for training
 def dataset_loader(currency_pair):
     dataset = data_reader.DataReader(currency_pair,
                                      start='2015-1-1',
@@ -25,6 +26,16 @@ def dataset_loader(currency_pair):
     close = dataset['Close']
    
     return close
+
+#dataset for testing 
+def test_data_loader(currency_pair):
+    data = data_reader.DataReader(currency_pair,
+                                  start='2020-1-1',
+                                  end= '2020-9-1',
+                                  data_source='yahoo')    
+    closing_price = data['Close']
+    return closing_price
+
 #the next function is the sigmoid activation function used for normalizing the
 #data
 

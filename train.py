@@ -5,7 +5,7 @@ import sys
 
 # hyprtparameters
 window_size = 10
-episodes = 5
+episodes = 50
 
 batch_size = 32
 data = dataset_loader("AAPL")
@@ -37,8 +37,17 @@ for episode in range(1, episodes + 1):
             total_profit += data[t] - buy_price
             print("AI Trader SOLD: ", formatPrice(
                 data[t]), " Profit: " + formatPrice(data[t] - buy_price))
+                
+        if t == data_samples - 1 :
+        # this for loop basically closes all open positions as the episode comes to an end. 
+    
+            for x in trader.inventory:
+                buy_price = trader.inventory.pop(0)
+                reward = max(data[t] - buy_price, 0)
+                total_profit += data[t] - buy_price
+                print("AI Trader SOLD: ", formatPrice(
+                data[t]), " Profit: " + formatPrice(data[t] - buy_price))
 
-        if t == data_samples - 1:
             done = True
 
         else:
@@ -49,10 +58,14 @@ for episode in range(1, episodes + 1):
         if done:
             print("########################")
             print("TOTAL PROFIT: {}".format(total_profit))
+            print("Final Inventory", trader.inventory)
             print("########################")
 
+           
         if len(trader.memory) > batch_size:
+            print("USING MEMORY TO TRADE")
             trader.expReplay(batch_size)
 
+   # save model weights and parameters at epochs divisible by 10
     if episode % 10 == 0:
         trader.model.save("ai_trader_{}.h5".format(episode))
