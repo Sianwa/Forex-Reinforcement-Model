@@ -17,7 +17,7 @@ for episode in range(1, episodes + 1):
     print("Episode: {}/{}".format(episode, episodes))
 
     state = state_creator(data, 0, window_size + 1)
-
+    balance = 100000
     total_profit = 0
     trader.inventory = []
 
@@ -55,9 +55,11 @@ for episode in range(1, episodes + 1):
 
         trader.memory.append((state, action, reward, next_state, done))
         state = next_state
+       
         if done:
             print("########################")
             print("TOTAL PROFIT: {}".format(total_profit))
+            print("ACCOUNT BALANCE: {}".format(balance + total_profit))
             print("Final Inventory", trader.inventory)
             print("########################")
 

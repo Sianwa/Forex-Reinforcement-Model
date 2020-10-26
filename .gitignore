@@ -3,3 +3,5 @@ project_env
 #byte compiled
 __pycache__/
 models
+tet.py
+AccConfig.yaml
