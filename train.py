@@ -5,10 +5,10 @@ import sys
 
 # hyprtparameters
 window_size = 10
-episodes = 50
+episodes = 100
 
 batch_size = 32
-data = dataset_loader("AAPL")
+data = forexdata_loader("GBP/USD")
 data_samples = len(data) - 1
 trader = AI_Trader(window_size)
 
@@ -57,6 +57,7 @@ for episode in range(1, episodes + 1):
         state = next_state
        
         if done:
+            trader.memory.clear()
             print("########################")
             print("TOTAL PROFIT: {}".format(total_profit))
             print("ACCOUNT BALANCE: {}".format(balance + total_profit))

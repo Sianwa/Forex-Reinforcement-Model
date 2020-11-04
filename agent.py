@@ -13,7 +13,7 @@ class AI_Trader:
     def __init__(self, state_size, is_eval=False, model_name=""):
         self.state_size = state_size  # normalized previous days
         self.action_size = 3  # sit, buy, sell
-        self.memory = deque(maxlen=1000)
+        self.memory = deque(maxlen=2000)
         self.inventory = []
         self.model_name = model_name
         self.is_eval = is_eval
@@ -43,6 +43,7 @@ class AI_Trader:
         options = self.model.predict(state)
         return np.argmax(options[0])
 
+
     def expReplay(self, batch_size):
        	mini_batch = []
         l = len(self.memory)
@@ -58,5 +59,6 @@ class AI_Trader:
             target_f[0][action] = target
             self.model.fit(state, target_f, epochs=1, verbose=0)
         
+        #decrease the epsilon parameter so that we stop performing random actions
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay 

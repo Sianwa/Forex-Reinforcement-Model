@@ -11,7 +11,7 @@ trained_model = load_model("models/ai_trader_50.h5")
 #hyperparameters
 window_size = 10
 batch_size = 32
-data = test_data_loader("TSLA")
+data = forexdata_loader("GBP/USD")
 data_samples = len(data) - 1
 trader = AI_Trader(window_size, True, "ai_trader_50.h5")
 
@@ -80,5 +80,5 @@ for t in tqdm(range(data_samples)):
             print("TOTAL PROFIT: {}".format(total_profit))
             print("Final Inventory", trader.inventory)
             performance = plotData(final_data)
-            #print(final_data)
+            #print(trader.memory)
             print("########################")

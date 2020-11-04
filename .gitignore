@@ -3,5 +3,6 @@ project_env
 #byte compiled
 __pycache__/
 models
-tet.py
+test.py
 AccConfig.yaml
+training.csv
