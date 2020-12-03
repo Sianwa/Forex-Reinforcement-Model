@@ -28,7 +28,7 @@ class AI_Trader:
 
     def _model(self):
         model = Sequential()
-        model.add(Dense(units=64, input_dim=self.state_size, activation="relu"))
+        model.add(Dense(units=64, input_shape=(3,4), activation="relu"))
         model.add(Dense(units=32, activation="relu"))
         model.add(Dense(units=8, activation="relu"))
         model.add(Dense(self.action_size, activation="linear"))
@@ -51,13 +51,13 @@ class AI_Trader:
             mini_batch.append(self.memory[i])
             
         for state, action, reward, next_state, done in mini_batch:
-            target = reward
+            reward = reward
             if not done:
-                target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+                reward = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
                 
-            target_f = self.model.predict(state)
-            target_f[0][action] = target
-            self.model.fit(state, target_f, epochs=1, verbose=0)
+            target = self.model.predict(state)
+            target[0] = reward
+            self.model.fit(state, target, epochs=1, verbose=0)
         
         #decrease the epsilon parameter so that we stop performing random actions
         if self.epsilon > self.epsilon_min:

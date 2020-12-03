@@ -5,7 +5,7 @@ import sys
 
 # hyprtparameters
 window_size = 10
-episodes = 100
+episodes = 1
 
 batch_size = 32
 data = forexdata_loader("GBP/USD")
@@ -29,7 +29,7 @@ for episode in range(1, episodes + 1):
 
         if action == 1:
             trader.inventory.append(data[t])
-            print("AI Trader BOUGHT:", formatPrice(data[t]))
+            print("AI Trader BOUGHT:", formatPrice(data[t]))    #data.iloc[t][0]
 
         elif action == 2 and len(trader.inventory) > 0:
             buy_price = trader.inventory.pop(0)

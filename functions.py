@@ -55,13 +55,24 @@ def forexdata_loader(currency_pair):
     macd_df = pd.DataFrame(macd, columns=['MACD'])
     signal_df = pd.DataFrame(signal,columns=['SIGNAL'])
     hist_df = pd.DataFrame(hist, columns=['HIST'])
-    final = pd.concat([df,sma_df,macd_df,signal_df], axis=1,join='outer', ignore_index=True)
+    final = pd.concat([df,sma_df,macd_df,signal_df], axis=1,join='outer')
+   
 
     #drop null values and return final usable data
     final_data = final.dropna()
-    final_data.to_csv("data/training.csv")
+    final_data.rename(columns = final_data.iloc[0])
+    final_data.reset_index(drop = True, inplace = True)
+    #final_data.to_csv("data/training.csv")
 
-    return final_data[0]
+    #change dataframe to list
+    my_data = [] 
+       #iterate over each row
+    for i, rows in final_data.iterrows():
+            my_list = [rows.close, rows.SMA, rows.MACD, rows.SIGNAL]
+            my_data.append(my_list)
+
+
+    return my_data
 
 
 #---------------------------------------------------the next function is for normalizing the data
@@ -69,7 +80,23 @@ def forexdata_loader(currency_pair):
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
-#---------------------------------------------------finally we need a state creater function that takes the data and generates states from it
+#---------------------------------------------------finally we need a state creator that uses price difference 
+
+def CreateState(data, timestep, window_size):
+    #create look-back function
+    starting_id = timestep - window_size + 1
+
+    if starting_id >=0:
+         windowData = data[starting_id:timestep + 1]
+    else:    
+         windowData = -starting_id * [data[0]] + list(data[0:timestep+1])
+
+    state =[]
+    for i in range(window_size- 1):
+          state.append(windowData[i])
+
+    return np.array([state])  
+#---------------------------------------------------state creator that uses the closing price plus indicators.
 
 def state_creator(data, timestep, window_size):
 
