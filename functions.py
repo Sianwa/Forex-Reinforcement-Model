@@ -94,7 +94,6 @@ def CreateState(data, timestep, window_size):
     state =[]
     for i in range(window_size- 1):
           state.append(windowData[i])
-
     return np.array([state])  
 #---------------------------------------------------state creator that uses the closing price plus indicators.
 

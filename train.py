@@ -4,8 +4,8 @@ from tqdm import tqdm
 import sys
 
 # hyprtparameters
-window_size = 10
-episodes = 1
+window_size = 3
+episodes = 20
 
 batch_size = 32
 data = forexdata_loader("GBP/USD")
@@ -16,37 +16,37 @@ trader = AI_Trader(window_size)
 for episode in range(1, episodes + 1):
     print("Episode: {}/{}".format(episode, episodes))
 
-    state = state_creator(data, 0, window_size + 1)
+    state = CreateState(data, 0, window_size + 1)
     balance = 100000
     total_profit = 0
     trader.inventory = []
+    
 
     for t in tqdm(range(data_samples)):
         action = trader.act(state)
-
-        next_state = state_creator(data, t+1, window_size + 1)
+        next_state = CreateState(data, t+1, window_size + 1)
         reward = 0
 
         if action == 1:
-            trader.inventory.append(data[t])
-            print("AI Trader BOUGHT:", formatPrice(data[t]))    #data.iloc[t][0]
+            trader.inventory.append(data[t][0])
+            print("AI Trader BOUGHT:", formatPrice(data[t][0]))    #data.iloc[t][0]
 
         elif action == 2 and len(trader.inventory) > 0:
             buy_price = trader.inventory.pop(0)
-            reward = max(data[t] - buy_price, 0)
-            total_profit += data[t] - buy_price
+            reward = max(data[t][0] - buy_price, 0)
+            total_profit += data[t][0] - buy_price
             print("AI Trader SOLD: ", formatPrice(
-                data[t]), " Profit: " + formatPrice(data[t] - buy_price))
+                data[t][0]), " Profit: " + formatPrice(data[t][0] - buy_price))
                 
         if t == data_samples - 1 :
         # this for loop basically closes all open positions as the episode comes to an end. 
     
             for x in trader.inventory:
                 buy_price = trader.inventory.pop(0)
-                reward = max(data[t] - buy_price, 0)
-                total_profit += data[t] - buy_price
+                reward = max(data[t][0] - buy_price, 0)
+                total_profit += data[t][0] - buy_price
                 print("AI Trader SOLD: ", formatPrice(
-                data[t]), " Profit: " + formatPrice(data[t] - buy_price))
+                data[t][0]), " Profit: " + formatPrice(data[t][0] - buy_price))
 
             done = True
 
@@ -55,7 +55,6 @@ for episode in range(1, episodes + 1):
 
         trader.memory.append((state, action, reward, next_state, done))
         state = next_state
-       
         if done:
             trader.memory.clear()
             print("########################")

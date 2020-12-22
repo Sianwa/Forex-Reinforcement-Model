@@ -41,22 +41,24 @@ class AI_Trader:
             return random.randrange(self.action_size)
 
         options = self.model.predict(state)
-        return np.argmax(options[0])
+        return np.argmax(options[0][0])
 
 
     def expReplay(self, batch_size):
        	mini_batch = []
-        l = len(self.memory)
+        l = len(self.memory) 
         for i in range(l - batch_size + 1, l):
             mini_batch.append(self.memory[i])
-            
+         
         for state, action, reward, next_state, done in mini_batch:
             reward = reward
+            action = action
             if not done:
+                #if agent is not in a terminal state we calculate the discounted total reward
                 reward = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
                 
             target = self.model.predict(state)
-            target[0] = reward
+            target[0][0][action] = reward
             self.model.fit(state, target, epochs=1, verbose=0)
         
         #decrease the epsilon parameter so that we stop performing random actions
