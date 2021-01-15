@@ -4,11 +4,11 @@ from tqdm import tqdm
 import sys
 
 # hyprtparameters
-window_size = 10
+window_size = 7
 episodes = 1
 
 batch_size = 32
-data = forexdata_loader("GBP/USD")
+data = dataset_loader("EUR/USD")
 data_samples = len(data) - 1
 trader = AI_Trader(window_size)
 
@@ -16,7 +16,8 @@ trader = AI_Trader(window_size)
 for episode in range(1, episodes + 1):
     print("Episode: {}/{}".format(episode, episodes))
 
-    state = state_creator(data, 0, window_size + 1)
+    i_state = state_creator(data, 0, window_size + 1)
+    state = i_state.reshape(1,7,1)
     balance = 100000
     total_profit = 0
     trader.inventory = []
@@ -24,7 +25,8 @@ for episode in range(1, episodes + 1):
     for t in tqdm(range(data_samples)):
         action = trader.act(state)
 
-        next_state = state_creator(data, t+1, window_size + 1)
+        n_state = state_creator(data, t+1, window_size + 1)
+        next_state = n_state.reshape(1, 7, 1)
         reward = 0
 
         if action == 1:

@@ -1,7 +1,7 @@
 import keras
 from keras.models import Sequential
 from keras.models import load_model
-from keras.layers import Dense
+from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import Adam
 
 import numpy as np
@@ -13,7 +13,7 @@ class AI_Trader:
     def __init__(self, state_size, is_eval=False, model_name=""):
         self.state_size = state_size  # normalized previous days
         self.action_size = 3  # sit, buy, sell
-        self.memory = deque(maxlen=2000)
+        self.memory = deque(maxlen=1000)
         self.inventory = []
         self.model_name = model_name
         self.is_eval = is_eval
@@ -24,13 +24,14 @@ class AI_Trader:
         self.epsilon_decay = 0.995
 
         self.model = load_model(
-            "models/" + model_name) if is_eval else self._model()
+             "models/" + model_name) if is_eval else self._model()
 
     def _model(self):
         model = Sequential()
-        model.add(Dense(units=64, input_shape=(3,4), activation="relu"))
-        model.add(Dense(units=32, activation="relu"))
-        model.add(Dense(units=8, activation="relu"))
+        model.add(LSTM(units=32, return_sequences=True, activation="relu", input_shape=(7,2)))
+        model.add(Dropout(0.2))
+        model.add(LSTM(units=32, activation="relu", return_sequences=True))
+        model.add(Dropout(0.2))
         model.add(Dense(self.action_size, activation="linear"))
         model.compile(loss="mse", optimizer=Adam(lr=0.001))
 
@@ -41,24 +42,26 @@ class AI_Trader:
             return random.randrange(self.action_size)
 
         options = self.model.predict(state)
-        return np.argmax(options[0])
-
+        return np.argmax(options[0][0])
 
     def expReplay(self, batch_size):
        	mini_batch = []
         l = len(self.memory)
         for i in range(l - batch_size + 1, l):
             mini_batch.append(self.memory[i])
-            
+
         for state, action, reward, next_state, done in mini_batch:
-            reward = reward
+            target = reward
             if not done:
-                reward = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
-                
-            target = self.model.predict(state)
-            target[0] = reward
-            self.model.fit(state, target, epochs=1, verbose=0)
+                target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+
+            target_f = self.model.predict(state)
+            target_f[0][0][action] = target
         
-        #decrease the epsilon parameter so that we stop performing random actions
+            history = self.model.fit(state, target_f, epochs=1, verbose=0)
+            #print(history.history)
+
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay 
+
+        return history.history
